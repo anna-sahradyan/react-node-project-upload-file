@@ -13,40 +13,42 @@ import {
 } from "../styledComponents/uploadStyle";
 
 
+
 const Upload = () => {
-    const [value, setValue] = useState('');
-    const [username, setUsername] = useState("");
-    const [imageName, setImageName] = useState("");
-    const [dataFile, setDataFile] = useState("");
     const [uploaded, setUploaded] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
     const filePicker = useRef(null);
+    const hostRrl = "/upload";
 
     function handleChange(event) {
         console.log('upload file work ');
         let target = event.target || event.srcElement || event.currentTarget;
         console.log(target.files);
-        setSelectedFile(target.files[0])
+        setSelectedFile(target.files[0]);
 
     }
 
-    const handelUpload = async (e) => {
-        e.preventDefault();
+    const handelUpload = async () => {
         if (!selectedFile) {
             alert("please select a file");
             return;
         }
         const formData = new FormData();
         formData.append("file", selectedFile);
-        const result = await fetch({
-            method: "POST",
-            body: formData,
+        const res = await fetch(hostRrl,{
+            method:"POST",
+            headers : {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body:formData,
         });
-        const data = await result.json();
+        const data = await res.json();
+
         setUploaded(data);
 
-    }
 
+    }
 
 
     const handlePick = () => {
@@ -78,13 +80,6 @@ const Upload = () => {
                 <Wrapper>
                     <Title>Send Files in Server </Title>
                     <Form onSubmit={(e) => e.preventDefault()}>
-                        <Input type={"text"} placeholder={'imageName'} name="image"
-                               onChange={(e) => setValue(e.target.value)}/>
-                        <Input type={"hidden"} name="imagename" placeholder={""} value={""}
-                               onChange={(e) => setImageName(e.target.value)}/>
-                        <Input placeholder={'username'} type={"text"} onChange={(e) => setUsername(e.target.value)}
-                               name={"username"} value={""}/>
-
 
                         <ButtonUpload className="hidden" id="upload" type="file" onChange={handleChange}
                                       ref={filePicker}
