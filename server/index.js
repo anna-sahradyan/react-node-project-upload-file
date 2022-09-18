@@ -1,33 +1,48 @@
-const express = require("express");
-const fileUpload = require("express-fileupload");
+const express = require('express')
 const app = express();
-app.use(express.json());
-const cors = require("cors");
+const path = require('path');
+const cors = require('cors');
+const multer = require('multer');
+const port = process.env.PORT || 5000;
+const connection = require('./config/database');
 app.use(cors());
-app.use(fileUpload({
-    createParentPath: true,
-}));
-app.post("/upload", (req, res) => {
-    if (!req.files) {
-        return res.status(400).json({msg: "No file uploaded"})
+const storage = multer.diskStorage({
+    destination: path.join(__dirname, './public_html/', 'uploads'),
+    filename: function (req, file, cb) {
+        // null as first argument means no error
+        cb(null, Date.now() + '-' + file.originalname )
     }
-    const file = req.files.file;
-    if (!file)
-        return res.json({error: "Incorrect input name"});
-    const newFileName = encodeURI(Date.now() + "-" + file.name);
-    file.mv(`${__dirname}/testnode/public/uploads/${newFileName}`, err => {
-        if (err) {
-            console.log(err);
-            return res.status(500).send(err);
-        }
-        console.log("file was uploaded");
-        res.json({
-            fileName: file.name,
-            filePath: `/uploads/${newFileName}`,
+})
+app.post('/upload', async (req, res) => {
+    try {
+        // 'avatar' is the name of our file input field in the HTML form
+        let upload = multer({ storage: storage}).single('avatar');
+
+        upload(req, res, function(err) {
+            // req.file contains information of uploaded file
+            // req.body contains information of text fields
+
+            if (!req.file) {
+                return res.send('Please select an image to upload');
+            }
+            else if (err instanceof multer.MulterError) {
+                return res.send(err);
+            }
+            else if (err) {
+                return res.send(err);
+            }
+
+            const classifiedsadd = {
+                image: req.file.filename
+            };
+
+            const sql = "INSERT INTO users SET ?";
+            connection.query(sql, classifiedsadd, (err, results) => {  if (err) throw err;
+                res.json({ success: 1 })
+
+            });
         });
-
-    });
-
+    } catch (err) {console.log(err)}
 });
 
-app.listen(5000, () => console.log("Server Started ..."));
+app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))

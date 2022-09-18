@@ -1,5 +1,5 @@
 import React from 'react';
-import Upload from "./components/inputBox/Upload";
+import Upload from "./components/inputBox/UploadFile";
 import Header from "./components/header/Header";
 
 
