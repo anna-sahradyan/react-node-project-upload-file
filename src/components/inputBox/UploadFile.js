@@ -4,7 +4,6 @@ import {
     ButtonUpload,
     Container,
     Form,
-    Input,
     Title,
     Wrapper,
     Image,
@@ -17,7 +16,7 @@ const UploadFile = () => {
     const [uploaded, setUploaded] = useState();
     const [selectedFile, setSelectedFile] = useState(null);
     const filePicker = useRef(null);
-    const hostRrl = "/upload";
+
 
     function handleChange(event) {
         console.log('upload file work ');
@@ -43,13 +42,8 @@ const UploadFile = () => {
             body: formData,
         });
         const data = await  JSON.stringify(res);
-
         setUploaded(data);
         console.log(data)
-
-
-
-
 
     }
 
